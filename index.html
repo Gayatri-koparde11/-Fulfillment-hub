@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fulfillment Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F4F5F2; --surface:#FFFFFF; --ink:#1C2430; --ink-soft:#5B6472;
+  --line:#DDE1DC; --accent:#2E6F6E; --accent-ink:#FFFFFF;
+  --warn:#B5541F; --warn-bg:#FBEAE0;
+  --danger:#B23A3A; --danger-bg:#FBE7E7;
+  --ok:#3F7D5C; --ok-bg:#E8F2EC;
+  --wait:#8A6D1D; --wait-bg:#FAF1DC;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#161A20; --surface:#1E232B; --ink:#EDEFEF; --ink-soft:#9AA3AE;
+    --line:#323942; --accent:#4FA8A6; --accent-ink:#0B1210;
+    --warn:#E08A50; --warn-bg:#3A2618;
+    --danger:#E27171; --danger-bg:#3A1E1E;
+    --ok:#6FBE93; --ok-bg:#17281F;
+    --wait:#E0C060; --wait-bg:#332C13;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#161A20; --surface:#1E232B; --ink:#EDEFEF; --ink-soft:#9AA3AE;
+  --line:#323942; --accent:#4FA8A6; --accent-ink:#0B1210;
+  --warn:#E08A50; --warn-bg:#3A2618;
+  --danger:#E27171; --danger-bg:#3A1E1E;
+  --ok:#6FBE93; --ok-bg:#17281F;
+  --wait:#E0C060; --wait-bg:#332C13;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:'IBM Plex Sans',system-ui,sans-serif;font-size:14px;line-height:1.5}
+.mono{font-family:'IBM Plex Mono',monospace}
+.app{display:flex;min-height:100%}
+nav{width:200px;flex:0 0 200px;background:var(--surface);border-right:1px solid var(--line);padding:20px 0;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{padding:0 20px 4px;font-weight:700;font-size:17px;letter-spacing:-.01em}
+.brand span{color:var(--accent)}
+.brand-sub{padding:0 20px 18px;font-size:11px;color:var(--ink-soft)}
+.navcount{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-soft)}
+.navitem{padding:11px 20px;cursor:pointer;color:var(--ink-soft);font-weight:500;border-left:3px solid transparent;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.navitem .navlabel{display:flex;align-items:center;gap:9px}
+.navitem svg{flex:0 0 auto;opacity:.75}
+.navitem.active svg{opacity:1;color:var(--accent)}
+.navitem:hover{color:var(--ink)}
+.navitem.active{color:var(--ink);border-left-color:var(--accent);background:var(--bg)}
+.navitem{margin:8px 12px;border-radius:10px;padding:10px 14px;border-left:none;border:1px solid transparent;background:linear-gradient(180deg, rgba(255,255,255,0.02), transparent);box-shadow:0 6px 18px rgba(10,14,18,0.04);transition:transform .12s ease, box-shadow .12s ease}
+.navitem:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(10,14,18,0.06);color:var(--ink)}
+.navitem.active{background:linear-gradient(180deg,var(--accent) 0%, rgba(255,255,255,0.02) 100%);color:var(--accent-ink);border-color:rgba(0,0,0,0.04)}
+.navcount{background:transparent;color:inherit;padding:2px 6px;border-radius:6px;font-size:12px}
+.badge{font-family:'IBM Plex Mono',monospace;font-size:11px;background:var(--danger-bg);color:var(--danger);padding:1px 6px;border-radius:3px}
+main{flex:1;padding:28px 32px;max-width:1100px}
+h1{font-size:21px;margin:0 0 4px;font-weight:700}
+.sub{color:var(--ink-soft);margin:0 0 22px;font-size:13.5px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
+.stat{background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--line);border-radius:6px;padding:14px 16px}
+.stat.warn{border-left-color:var(--warn)} .stat.danger{border-left-color:var(--danger)} .stat.ok{border-left-color:var(--ok)}
+.stat .n{font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600}
+.stat .l{color:var(--ink-soft);font-size:12.5px;margin-top:2px}
+.stat.warn .n{color:var(--warn)} .stat.danger .n{color:var(--danger)} .stat.ok .n{color:var(--ok)}
+section.block{background:var(--surface);border:1px solid var(--line);border-radius:6px;margin-bottom:18px;overflow:hidden}
+.block h2{font-size:13px;text-transform:none;font-weight:600;margin:0;padding:12px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11.5px;color:var(--ink-soft);font-weight:600;padding:8px 14px;border-bottom:1px solid var(--line)}
+td{padding:9px 14px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--bg)}
+tr.priority-row td:first-child{box-shadow:inset 3px 0 0 var(--warn)}
+.pill{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.p-received{background:var(--wait-bg);color:var(--wait)}
+.p-processed{background:var(--wait-bg);color:var(--wait)}
+.p-picking{background:var(--warn-bg);color:var(--warn)}
+.p-packed{background:var(--warn-bg);color:var(--warn)}
+.p-staged{background:var(--ok-bg);color:var(--ok)}
+.p-shipped{background:var(--ok-bg);color:var(--ok)}
+.flag{color:var(--danger);font-weight:600;font-size:11.5px}
+.controls{display:flex;gap:8px;padding:12px 16px;flex-wrap:wrap;align-items:center}
+select,input[type=text],input[type=number]{font-family:inherit;font-size:13px;padding:6px 9px;border:1px solid var(--line);border-radius:5px;background:var(--surface);color:var(--ink)}
+button{font-family:inherit;font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:5px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+button:hover{border-color:var(--accent);color:var(--accent)}
+button.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+button.primary:hover{opacity:.88;color:var(--accent-ink)}
+button.danger{color:var(--danger)}
+.row-actions{display:flex;gap:6px;flex-wrap:wrap}
+.muted{color:var(--ink-soft)}
+.lowstock{color:var(--danger);font-weight:600}
+.issue{padding:11px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px}
+.issue:last-child{border-bottom:none}
+.issue.resolved{opacity:.5}
+.issue .txt{font-size:13px}
+.issue .meta{color:var(--ink-soft);font-size:11.5px;margin-top:2px}
+.newissue{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--line)}
+.newissue input{flex:1}
+.empty{padding:24px 16px;text-align:center;color:var(--ink-soft);font-size:13px}
+/* modal overlay */
+.overlay{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(8,10,12,0.45);z-index:40}
+.modal{background:var(--surface);border-radius:10px;min-width:320px;max-width:720px;padding:18px;border:1px solid var(--line);box-shadow:0 10px 30px rgba(8,10,12,0.12)}
+.modal h3{margin:0 0 8px}
+.modal .meta{color:var(--ink-soft);font-size:13px;margin-bottom:12px}
+.modal .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}
+/* Dashboard visuals */
+.hero{display:flex;gap:14px;align-items:stretch;margin-bottom:18px}
+.kpi{flex:1;background:linear-gradient(180deg,var(--surface),#fbfdff);border:1px solid var(--line);border-radius:10px;padding:16px;display:flex;flex-direction:column;justify-content:space-between}
+.kpi .label{color:var(--ink-soft);font-size:12px}
+.kpi .value{font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:700;margin-top:6px}
+.kpi .trend{font-size:12px;color:var(--ok);margin-top:8px}
+.chart-card{background:linear-gradient(180deg,var(--surface),#fff);border:1px solid var(--line);border-radius:10px;padding:14px}
+.big-chart{width:100%;height:220px}
+.priority-list{display:flex;flex-direction:column;gap:8px;padding:8px;max-height:220px;overflow:auto}
+.priority-item{display:flex;justify-content:space-between;align-items:center;padding:8px;border-radius:8px;background:linear-gradient(90deg,rgba(255,255,255,0.02),transparent);border:1px solid var(--line)}
+.avatar{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#6ec3c1);color:var(--accent-ink);display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+.timeline{padding:10px;display:flex;flex-direction:column;gap:10px}
+.timeline .item{display:flex;gap:10px;align-items:flex-start}
+.timeline .dot{width:10px;height:10px;border-radius:50%;background:var(--accent);margin-top:6px}
+.cta-pickup{display:flex;align-items:center;justify-content:space-between;padding:12px;border-radius:8px;background:linear-gradient(90deg,var(--ok-bg),#f5fffb);border:1px solid var(--line)}
+.page-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:18px}
+.page-head .title{font-size:26px;font-weight:800;letter-spacing:-0.015em}
+.page-head .subtitle{color:var(--ink-soft);margin-top:6px}
+.head-actions{display:flex;gap:8px;align-items:center}
+.head-actions button{padding:8px 12px;border-radius:8px}
+@media (max-width:760px){.app{flex-direction:column}nav{width:100%;height:auto;position:static;display:flex;overflow-x:auto;padding:10px}.brand{display:none}.navitem{padding:8px 14px;border-left:none;border-bottom:2px solid transparent;white-space:nowrap}.navitem.active{border-bottom-color:var(--accent)}main{padding:18px}.grid4{grid-template-columns:repeat(2,1fr)}table{display:block;overflow-x:auto}}
+</style>
+</head>
+<body>
+<div class="app">
+  <nav>
+    <div class="brand">Fulfillment <span>Hub</span></div>
+    <div class="brand-sub">XYZ Operations · demo data</div>
+    <div class="navitem" data-view="dashboard"><span class="navlabel"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1.5" y="1.5" width="6" height="6" rx="1"/><rect x="8.5" y="1.5" width="6" height="4" rx="1"/><rect x="8.5" y="7.5" width="6" height="7" rx="1"/><rect x="1.5" y="9.5" width="6" height="5" rx="1"/></svg>Dashboard</span> <span class="navcount" id="cnt-dashboard"></span></div>
+    <div class="navitem" data-view="orders"><span class="navlabel"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><line x1="4" y1="3.5" x2="14" y2="3.5"/><line x1="4" y1="8" x2="14" y2="8"/><line x1="4" y1="12.5" x2="14" y2="12.5"/><circle cx="1.7" cy="3.5" r="1"/><circle cx="1.7" cy="8" r="1"/><circle cx="1.7" cy="12.5" r="1"/></svg>Orders</span> <span class="navcount" id="cnt-orders"></span></div>
+    <div class="navitem" data-view="inventory"><span class="navlabel"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1.5 4.5 8 1.5l6.5 3v7L8 14.5l-6.5-3z"/><path d="M1.5 4.5 8 7.5l6.5-3"/><line x1="8" y1="7.5" x2="8" y2="14.5"/></svg>Inventory</span> <span class="navcount" id="cnt-inventory"></span></div>
+    <div class="navitem" data-view="picking"><span class="navlabel"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 4h12v2H2z"/><path d="M4 8h8v6H4z"/></svg>Picking</span> <span class="navcount" id="cnt-picking"></span></div>
+    <div class="navitem" data-view="packed"><span class="navlabel"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2 3h12v10H2z"/><path d="M2 7h12"/></svg>Packed</span> <span class="navcount" id="cnt-packed"></span></div>
+    <div class="navitem" data-view="staged"><span class="navlabel"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="8" cy="8" r="6"/></svg>Staged</span> <span class="navcount" id="cnt-staged"></span></div>
+    <div class="navitem" data-view="shipped"><span class="navlabel"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 11h10l4-5H5"/><circle cx="6" cy="13" r="1"/><circle cx="12" cy="13" r="1"/></svg>Shipped</span> <span class="navcount" id="cnt-shipped"></span></div>
+    <div class="navitem" data-view="issues"><span class="navlabel"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M8 1.8 14.8 13.5H1.2z"/><line x1="8" y1="6.2" x2="8" y2="9.6"/><circle cx="8" cy="11.6" r="0.5" fill="currentColor"/></svg>Issues</span> <span class="badge" id="issueBadge"></span></div>
+  </nav>
+  <main id="main"></main>
+</div>
+<script>
+const STATUSES=["Received","Processed","Picking","Packed","Staged","Shipped"];
+const COURIERS=["Swiftr Express","BlueDart Local","PinPost"];
+const NAMES=["Anita Rao","Kabir Shah","Meera Iyer","Rohan Das","Priya Nair","Vikram Sen","Farah Khan","Aditya Rao","Neha Joshi","Sam Verma"];
+const PRODUCTS=[["Ceramic Mug - Blue","MUG-BLU"],["Ceramic Mug - White","MUG-WHT"],["Tote Bag - Canvas","TOT-CNV"],["Notebook - A5 Dot","NBK-A5D"],["Desk Lamp - Mini","LMP-MIN"],["Water Bottle - 750ml","BTL-750"],["Candle - Sandalwood","CND-SDL"],["Yoga Mat - 6mm","YGM-6MM"],["Phone Stand - Wood","PHS-WOD"],["Cushion Cover - Linen","CSH-LIN"]];
+
+function loadOrCreate(key, factory){
+  try{ const raw=localStorage.getItem(key); if(raw) return JSON.parse(raw); }catch(e){}
+  const val=factory(); try{ localStorage.setItem(key, JSON.stringify(val)); }catch(e){}
+  return val;
+}
+function save(){
+  try{
+    localStorage.setItem('fh_orders', JSON.stringify(state.orders));
+    localStorage.setItem('fh_stock', JSON.stringify(state.stock));
+    localStorage.setItem('fh_issues', JSON.stringify(state.issues));
+  }catch(e){}
+}
+
+function genOrders(){
+  const out=[]; const now=Date.now();
+  for(let i=1;i<=42;i++){
+    const statusIdx = i<=26 ? Math.floor(Math.random()*6) : Math.floor(Math.random()*4);
+    const priority = Math.random()<0.22;
+    const hoursAgo = Math.floor(Math.random()*30)+1;
+    const deadlineHrs = priority ? 24 : 72;
+    const created = now - hoursAgo*3600*1000;
+    const items = PRODUCTS[Math.floor(Math.random()*PRODUCTS.length)];
+    out.push({
+      id:"ORD-"+(1000+i),
+      customer:NAMES[Math.floor(Math.random()*NAMES.length)],
+      sku:items[1], product:items[0], qty:1+Math.floor(Math.random()*3),
+      priority, status:STATUSES[statusIdx],
+      courier:COURIERS[Math.floor(Math.random()*COURIERS.length)],
+      created, deadlineHrs
+    });
+  }
+  return out;
+}
+function genStock(){
+  return PRODUCTS.map(([name,sku])=>({
+    sku, name,
+    main: Math.floor(Math.random()*40),
+    secondary: Math.floor(Math.random()*60),
+    threshold: 12
+  }));
+}
+function genIssues(){
+  return [
+    {id:1, text:"ORD-1014: wrong variant (Blue vs White mug) caught at packing", type:"Mismatch", resolved:true, ts:Date.now()-3600e3*20},
+    {id:2, text:"ORD-1027: courier missed scheduled pickup window", type:"Courier", resolved:false, ts:Date.now()-3600e3*5},
+    {id:3, text:"CSH-LIN short by 4 units vs spreadsheet count", type:"Stock", resolved:false, ts:Date.now()-3600e3*2}
+  ];
+}
+
+const state={
+  orders: loadOrCreate('fh_orders', genOrders),
+  stock: loadOrCreate('fh_stock', genStock),
+  issues: loadOrCreate('fh_issues', genIssues),
+  view:'dashboard',
+  filter:'all', sort:'priority'
+};
+
+function fmtAge(ts){ const h=Math.floor((Date.now()-ts)/3600000); return h<1?"just now":h+"h ago"; }
+function isAtRisk(o){ const h=(Date.now()-o.created)/3600000; return o.status!=="Shipped" && h > o.deadlineHrs*0.75; }
+function nextStatus(s){ const i=STATUSES.indexOf(s); return i<STATUSES.length-1?STATUSES[i+1]:null; }
+
+function advance(id){
+  const o=state.orders.find(x=>x.id===id);
+  if(!o) return;
+  if(o.status==="Picking" && o.status!=="Shipped"){
+    const st=state.stock.find(s=>s.sku===o.sku);
+    if(st && st.main < o.qty){
+      state.issues.unshift({id:Date.now(), text:o.id+": can't pick "+o.product+" — insufficient stock in main warehouse", type:"Stock", resolved:false, ts:Date.now()});
+      save(); render(); return;
+    }
+  }
+  const ns=nextStatus(o.status);
+  if(ns==="Picking"){
+    const st=state.stock.find(s=>s.sku===o.sku);
+    if(st) st.main = Math.max(0, st.main - o.qty);
+  }
+  if(ns) o.status=ns;
+  save(); render();
+}
+function flagIssue(id){
+  const o=state.orders.find(x=>x.id===id);
+  state.issues.unshift({id:Date.now(), text:o.id+" ("+o.product+"): flagged during "+o.status.toLowerCase()+" — needs check", type:"Mismatch", resolved:false, ts:Date.now()});
+  save(); render();
+}
+function transferStock(sku){
+  const st=state.stock.find(s=>s.sku===sku);
+  const amt=Math.min(st.secondary, 20);
+  st.secondary -= amt; st.main += amt;
+  save(); render();
+}
+function toggleIssue(id){
+  const it=state.issues.find(x=>x.id===id); it.resolved=!it.resolved; save(); render();
+}
+function addIssue(text){
+  if(!text.trim()) return;
+  state.issues.unshift({id:Date.now(), text:text.trim(), type:"Manual", resolved:false, ts:Date.now()});
+  save(); render();
+}
+
+function pill(status){ return `<span class="pill p-${status.toLowerCase()}">${status}</span>`; }
+
+function viewDashboard(){
+  const active=state.orders.filter(o=>o.status!="Shipped");
+  const priorityOpen=active.filter(o=>o.priority);
+  const atRisk=active.filter(isAtRisk);
+  const lowStock=state.stock.filter(s=>s.main<s.threshold);
+  const openIssues=state.issues.filter(i=>!i.resolved);
+  const stagedReady=state.orders.filter(o=>o.status==="Staged");
+  const counts=STATUSES.map(s=>state.orders.filter(o=>o.status===s).length);
+  // small sparkline points from recent orders per hour (synthetic)
+  const recent = Array.from({length:12}).map((_,i)=>Math.max(0, Math.round(5 + 6*Math.sin(i/2) + (Math.random()*4-2))));
+  const maxR = Math.max(...recent,1);
+  const sparkPoints = recent.map((v,i)=>`${i*(100/(recent.length-1))},${80 - (v/maxR)*60}`).join(' ');
+  const areaPath = `M0,80 ${recent.map((v,i)=>`${i*(100/(recent.length-1))},${80 - (v/maxR)*60}`).join(' ')} L100,80 Z`;
+  return `
+  <div class="hero">
+    <div class="kpi"><div class="label">Orders in progress</div><div class="value">${active.length}</div><div class="trend">${priorityOpen.length} priority · ${stagedReady.length} staged</div></div>
+    <div class="kpi"><div class="label">At risk</div><div class="value" style="color:var(--danger)">${atRisk.length}</div><div class="trend">${atRisk.length? 'Take action to avoid late shipments' : 'No immediate risk'}</div></div>
+    <div class="kpi"><div class="label">Low SKUs</div><div class="value">${lowStock.length}</div><div class="trend">${lowStock.length? 'Transfer from secondary' : 'Stock levels healthy'}</div></div>
+    <div class="kpi"><div class="label">Open issues</div><div class="value">${openIssues.length}</div><div class="trend">${openIssues.length? 'Resolve to avoid delays' : 'No open issues'}</div></div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:18px">
+    <div class="chart-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><strong>Volume (recent hours)</strong><span class="muted">Activity trend</span></div>
+      <svg class="big-chart" viewBox="0 0 100 80" preserveAspectRatio="none">
+        <defs><linearGradient id="g1" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="var(--accent)" stop-opacity="0.28"/><stop offset="1" stop-color="var(--accent)" stop-opacity="0.02"/></linearGradient></defs>
+        <path d="${areaPath}" fill="url(#g1)" stroke="none"></path>
+        <polyline points="${sparkPoints}" fill="none" stroke="var(--accent)" stroke-width="1.2" stroke-linejoin="round" stroke-linecap="round"/>
+        ${recent.map((v,i)=>`<circle cx="${i*(100/(recent.length-1))}" cy="${80 - (v/maxR)*60}" r="1" fill="var(--accent)"/>`).join('')}
+      </svg>
+      <div style="display:flex;gap:10px;margin-top:10px">
+        ${STATUSES.map((s,i)=>`<div style="flex:1;text-align:center"><div style="font-weight:700;font-family:'IBM Plex Mono'">${counts[i]}</div><div class="muted" style="font-size:12px">${s}</div></div>`).join('')}
+      </div>
+    </div>
+    <div>
+      <section class="block" style="margin-bottom:12px">
+        <h2>Priority queue <span class="muted">(top open)</span></h2>
+        <div class="priority-list">
+          ${priorityOpen.sort((a,b)=>a.created-b.created).slice(0,8).map(o=>`<div class="priority-item"><div style="display:flex;gap:10px;align-items:center"><div class="avatar">${o.customer.split(' ').map(n=>n[0]).slice(0,2).join('')}</div><div><div style="font-weight:700">${o.product}</div><div class="muted mono" style="font-size:12px">${o.id} · ${fmtAge(o.created)}</div></div></div><div>${pill(o.status)} ${o.priority?'<span class="flag">★</span>':''}</div></div>`).join('')}
+          ${priorityOpen.length===0?'<div class="empty">No priority orders</div>':''}
+        </div>
+      </section>
+      <section class="block">
+        <h2>Staged & pickup</h2>
+        <div style="padding:12px"><div class="cta-pickup"><div><strong>${stagedReady.length} boxes staged</strong><div class="muted" style="font-size:13px">Ready for courier pickup</div></div><div><button class="primary" onclick="alert('Simulated: notify courier (demo)')">Notify courier</button></div></div></div>
+      </section>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+    <section class="block">
+      <h2>Recent activity</h2>
+      <div class="timeline">
+        ${state.issues.slice(0,6).map(i=>`<div class="item"><div class="dot"></div><div><div style="font-weight:700">${i.text}</div><div class="muted" style="font-size:12px">${i.type} · ${fmtAge(i.ts)}</div></div></div>`).join('')}
+      </div>
+    </section>
+    <section class="block">
+      <h2>Latest orders</h2>
+      <div style="padding:6px 12px">
+        ${state.orders.slice(0,8).map(o=>`<div style="display:flex;justify-content:space-between;padding:8px 6px;border-bottom:1px dashed var(--line)"><div><div style="font-weight:700">${o.id} · ${o.product}</div><div class="muted" style="font-size:12px">${o.customer} · ${fmtAge(o.created)}</div></div><div class="muted">${pill(o.status)}</div></div>`).join('')}
+      </div>
+    </section>
+  </div>`;
+}
+
+function viewOrders(){
+  let list=[...state.orders];
+  // support direct stage views by using state.view when it matches a stage
+  const capView = state.view.charAt(0).toUpperCase()+state.view.slice(1);
+  const effectiveFilter = (STATUSES.includes(capView) && state.view!=='orders') ? capView : state.filter;
+  if(effectiveFilter==='priority') list=list.filter(o=>o.priority);
+  if(effectiveFilter==='active') list=list.filter(o=>o.status!=="Shipped");
+  if(effectiveFilter!=='all' && STATUSES.includes(effectiveFilter)) list=list.filter(o=>o.status===effectiveFilter);
+  list.sort((a,b)=> state.sort==='priority' ? (b.priority-a.priority)||(a.created-b.created) : a.created-b.created);
+  return `
+  <p class="sub">${state.orders.length} orders total · click Advance to move an order to its next step</p>
+  <section class="block">
+    <div class="controls">
+      <select id="filterSel">
+        <option value="all">All orders</option>
+        <option value="active">In progress</option>
+        <option value="priority">Priority only</option>
+        ${STATUSES.map(s=>`<option value="${s}">${s} only</option>`).join('')}
+      </select>
+    </div>
+    <table><thead><tr><th>Order</th><th>Customer</th><th>Item</th><th>Status</th><th>Courier</th><th>Age</th><th></th></tr></thead>
+    <tbody>${list.map(o=>`
+      <tr onclick="openOrderModal('${o.id}')" class="${o.priority?'priority-row':''}">
+        <td class="mono">${o.id}${o.priority?' <span class="flag">★</span>':''}</td>
+        <td>${o.customer}</td>
+        <td>${o.product} <span class="muted">×${o.qty}</span></td>
+        <td>${pill(o.status)}${isAtRisk(o)?' <span class="flag">at risk</span>':''}</td>
+        <td class="muted">${o.courier}</td>
+        <td class="muted">${fmtAge(o.created)}</td>
+        <td><div class="row-actions">
+          ${o.status!=="Shipped"?`<button class="primary" onclick="event.stopPropagation(); advance('${o.id}')">Advance</button>`:'<span class="muted">Done</span>'}
+          ${o.status!=="Shipped"?`<button class="danger" onclick="event.stopPropagation(); flagIssue('${o.id}')">Flag</button>`:''}
+        </div></td>
+      </tr>`).join('')}</tbody></table>
+  </section>`;
+}
+
+function viewInventory(){
+  return `
+  <p class="sub">Stock only ships from the main warehouse — transfer from secondary when main runs low</p>
+  <section class="block">
+    <table><thead><tr><th>Product</th><th>SKU</th><th>Main warehouse</th><th>Secondary warehouse</th><th></th></tr></thead>
+    <tbody>${state.stock.map(s=>`
+      <tr>
+        <td>${s.name}</td>
+        <td class="mono muted">${s.sku}</td>
+        <td class="${s.main<s.threshold?'lowstock':''}">${s.main} ${s.main<s.threshold?'· low':''}</td>
+        <td>${s.secondary}</td>
+        <td>${s.secondary>0? `<button onclick="transferStock('${s.sku}')">Transfer to main</button>` : '<span class="muted">Empty</span>'}</td>
+      </tr>`).join('')}</tbody></table>
+  </section>`;
+}
+
+function viewIssues(){
+  const open=state.issues.filter(i=>!i.resolved), done=state.issues.filter(i=>i.resolved);
+  return `
+  <p class="sub">A running log so problems don't get forgotten — resolve once handled</p>
+  <section class="block">
+    <h2>Open (${open.length})</h2>
+    ${open.length? open.map(i=>`<div class="issue"><div><div class="txt">${i.text}</div><div class="meta">${i.type} · ${fmtAge(i.ts)}</div></div><button onclick="toggleIssue(${i.id})">Resolve</button></div>`).join(''):`<div class="empty">No open issues.</div>`}
+    <div class="newissue"><input type="text" id="newIssueTxt" placeholder="Log a new issue…"><button class="primary" onclick="submitIssue()">Add</button></div>
+  </section>
+  <section class="block">
+    <h2>Resolved (${done.length})</h2>
+    ${done.length? done.map(i=>`<div class="issue resolved"><div><div class="txt">${i.text}</div><div class="meta">${i.type} · ${fmtAge(i.ts)}</div></div><button onclick="toggleIssue(${i.id})">Reopen</button></div>`).join(''):`<div class="empty">Nothing resolved yet.</div>`}
+  </section>`;
+}
+function submitIssue(){ const el=document.getElementById('newIssueTxt'); addIssue(el.value); el.value=''; }
+
+function render(){
+  document.querySelectorAll('.navitem').forEach(n=>n.classList.toggle('active', n.dataset.view===state.view));
+  const openCount=state.issues.filter(i=>!i.resolved).length;
+  document.getElementById('issueBadge').textContent = openCount||'';
+  document.getElementById('issueBadge').style.display = openCount? 'inline-block':'none';
+  document.getElementById('cnt-dashboard').textContent = state.orders.filter(o=>o.status!=="Shipped").length;
+  document.getElementById('cnt-orders').textContent = state.orders.length;
+  document.getElementById('cnt-inventory').textContent = state.stock.filter(s=>s.main<s.threshold).length||'';
+  document.getElementById('cnt-picking').textContent = state.orders.filter(o=>o.status==='Picking').length||'';
+  document.getElementById('cnt-packed').textContent = state.orders.filter(o=>o.status==='Packed').length||'';
+  document.getElementById('cnt-staged').textContent = state.orders.filter(o=>o.status==='Staged').length||'';
+  document.getElementById('cnt-shipped').textContent = state.orders.filter(o=>o.status==='Shipped').length||'';
+  const m=document.getElementById('main');
+  const titles = {dashboard:'Dashboard', orders:'Orders', inventory:'Inventory', picking:'Picking', packed:'Packed', staged:'Staged', shipped:'Shipped', issues:'Issues'};
+  const title = titles[state.view] || (state.view.charAt(0).toUpperCase()+state.view.slice(1));
+  let subtitle = '';
+  if(state.view==='dashboard') subtitle = `Live snapshot — ${state.orders.filter(o=>o.status!=='Shipped').length} orders in progress`;
+  else if(state.view==='orders') subtitle = `${state.orders.length} orders total · click Advance to move an order to its next step`;
+  else if(state.view==='inventory') subtitle = `Stock only ships from the main warehouse — transfer from secondary when main runs low`;
+  else if(state.view==='issues') subtitle = `A running log so problems don't get forgotten — resolve once handled`;
+  else if(STATUSES.map(s=>s.toLowerCase()).includes(state.view)) subtitle = `${state.orders.filter(o=>o.status.toLowerCase()===state.view).length} orders in ${title}`;
+
+  const headHTML = `<div class="page-head"><div><div class="title">${title}</div><div class="subtitle">${subtitle}</div></div><div class="head-actions"><button onclick="reloadView()">Refresh</button><button onclick="exportView()">Export</button></div></div>`;
+
+  if(state.view==='dashboard') m.innerHTML = headHTML + viewDashboard();
+  else if(state.view==='orders') m.innerHTML = headHTML + viewOrders();
+  else if(state.view==='inventory') m.innerHTML = headHTML + viewInventory();
+  else if(state.view==='issues') m.innerHTML = headHTML + viewIssues();
+  else if(STATUSES.map(s=>s.toLowerCase()).includes(state.view)) { state.filter = 'all'; m.innerHTML = headHTML + viewOrders(); }
+  if(state.view==='orders'){
+    const sel=document.getElementById('filterSel');
+    sel.value=state.filter;
+    sel.onchange=()=>{state.filter=sel.value; render();};
+  }
+}
+document.querySelectorAll('.navitem').forEach(n=>n.addEventListener('click',()=>{state.view=n.dataset.view; render();}));
+render();
+// Order detail modal
+function openOrderModal(id){
+  const o=state.orders.find(x=>x.id===id); if(!o) return;
+  const overlay=document.createElement('div'); overlay.className='overlay';
+  overlay.innerHTML=`<div class="modal"><h3>${o.id} · ${o.product}</h3><div class="meta">${o.customer} · ${o.qty} × · ${o.courier} · ${fmtAge(o.created)}</div>
+    <div><strong>Status:</strong> ${pill(o.status)} ${o.priority?'<span class="flag">PRIORITY</span>':''}</div>
+    <div style="margin-top:10px">${o.status!=='Shipped'?'<div style="color:var(--ink-soft)">Use the actions below to advance the order through the workflow or flag an issue.</div>':''}<div style="margin-top:8px;color:var(--ink-soft)">Stock main: ${state.stock.find(s=>s.sku===o.sku)?.main||0}</div></div>
+    <div class="actions">
+      ${o.status!=='Shipped'?`<button class="primary" onclick="event.stopPropagation(); advance('${o.id}'); closeModal()">Advance</button>`:''}
+      ${o.status!=='Shipped'?`<button class="danger" onclick="event.stopPropagation(); flagIssue('${o.id}'); closeModal()">Flag issue</button>`:''}
+      ${o.status!=='Shipped' && (state.stock.find(s=>s.sku===o.sku)?.main||0) < o.qty ? `<button onclick="event.stopPropagation(); transferStock('${o.sku}'); closeModal();">Transfer stock</button>` : ''}
+      <button onclick="event.stopPropagation(); state.view='orders'; render(); closeModal();">Go to Orders</button>
+      <button onclick="event.stopPropagation(); closeModal();">Close</button>
+    </div></div>`;
+  overlay.onclick = (e)=>{ if(e.target===overlay) closeModal(); };
+  document.body.appendChild(overlay);
+  function closeModal(){ overlay.remove(); }
+  window.closeModal = closeModal;
+}
+function reloadView(){ render(); }
+function exportView(){
+  const payload = {orders: state.orders, stock: state.stock, issues: state.issues};
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(payload, null, 2));
+  const a = document.createElement('a'); a.href = dataStr; a.download = 'fulfillment-hub-export.json'; document.body.appendChild(a); a.click(); a.remove();
+}
+</script>
+</body>
+</html>
