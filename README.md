@@ -60,3 +60,12 @@ The brief specifies the warehouse team is experienced but not comfortable with t
 A single self-contained `index.html` — HTML, CSS, and vanilla JavaScript, no framework or build tooling. State lives in memory and `localStorage`; there is no backend, by design, since the brief doesn't require one for a demo built on sample data.
 
 ## Files
+fulfillment-hub/
+├── index.html the application
+├── README.md this file
+└── AI_Usage_Note.pdf AI usage note for this submission
+
+
+## If this went further
+
+Real courier-API integration and shipping label generation, barcode/scanner support for the picking floor, and role-based views (office vs. warehouse) would be the natural next additions — each was left out here because it adds real-world integration complexity without changing what this demo needs to prove.
